@@ -36,8 +36,8 @@ export default function astalify<
         get noImplicitDestroy(): boolean { return this[noImplicitDestroy] }
         set noImplicitDestroy(value: boolean) { this[noImplicitDestroy] = value }
 
-        set actionGroup([prefix, group]: ActionGroup) { this.insert_action_group(prefix, group) }
-        set_action_group(actionGroup: ActionGroup) { this.actionGroup = actionGroup }
+        set insertActionGroup([prefix, group]: ActionGroup) { this.insert_action_group(prefix, group) }
+        set_insert_action_group(actionGroup: ActionGroup) { this.actionGroup = actionGroup }
 
         protected getChildren(): Array<Gtk.Widget> {
             if (this instanceof Gtk.Bin) {
