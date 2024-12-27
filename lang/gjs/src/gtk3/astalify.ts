@@ -36,8 +36,6 @@ export default function astalify<
         get noImplicitDestroy(): boolean { return this[noImplicitDestroy] }
         set noImplicitDestroy(value: boolean) { this[noImplicitDestroy] = value }
 
-        set insertActionGroup([prefix, group]: ActionGroup) { this.insert_action_group(prefix, group) }
-
         protected getChildren(): Array<Gtk.Widget> {
             if (this instanceof Gtk.Bin) {
                 return this.get_child() ? [this.get_child()!] : []
@@ -96,6 +94,30 @@ export default function astalify<
             return this
         }
 
+        declare private _actionGroups: { [name: `actionGroup${string}`]: Gio.ActionGroup | null }
+
+        get actionGroups(): { [name: string]: Gio.ActionGroup | null } {
+            return this._actionGroups;
+        }
+
+        set actionGroups(value: { [name: string]: Gio.ActionGroup | null }) {
+            const self = this
+
+            self._actionGroups = new Proxy({}, {
+                get(_, prop) {
+                    return self.get_action_group(prop.toString())
+                },
+                set(_, prop, value): boolean {
+                    self.insert_action_group(prop.toString(), value)
+
+                    return true
+                }
+            })
+            for (const [key, val] of Object.entries(value)) {
+                self._actionGroups[key] = val
+            }
+        }
+
         constructor(...params: any[]) {
             super()
             const props = params[0] || {}
@@ -149,7 +171,7 @@ export type ConstructProps<
     css?: string
     cursor?: string
     clickThrough?: boolean
-    insertActionGroup?: ActionGroup
+    actionGroups?: { [name: string]: Gio.ActionGroup | null }
 }>> & Partial<{
     onDestroy: (self: Self) => unknown
     onDraw: (self: Self) => unknown
@@ -196,5 +218,3 @@ type Cursor =
     | "nwse-resize"
     | "zoom-in"
     | "zoom-out"
-
-type ActionGroup = [prefix: string, actionGroup: Gio.ActionGroup]
